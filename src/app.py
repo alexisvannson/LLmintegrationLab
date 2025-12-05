@@ -334,6 +334,15 @@ with tab3:
             horizontal=True
         )
 
+        # Custom guidance text area
+        st.subheader("Custom Guidance (Optional)")
+        user_guidance = st.text_area(
+            "Add any specific context or focus areas for the AI to consider:",
+            placeholder="e.g., 'I want to focus on reducing transportation emissions' or 'I'm considering switching to renewable energy' or 'I have dietary restrictions'",
+            help="This text will guide the AI to provide more personalized and relevant advice based on your specific situation or goals.",
+            height=100
+        )
+
         if st.button("Generate AI Analysis", type="primary", use_container_width=True):
             user_data = {
                 'total_emissions': total_emissions,
@@ -353,7 +362,8 @@ with tab3:
                         user_data,
                         climate_context,
                         stats,
-                        user_location or None
+                        user_location or None,
+                        user_guidance or None
                     )
                 elif analysis_type == "Compare with Previous":
                     recent = services['db'].get_recent_records(2)
@@ -369,6 +379,8 @@ with tab3:
                 else:
                     # Quick tips
                     quick_prompt = f"Give 3 quick, actionable tips to reduce a {total_emissions:.1f} kg CO₂/day footprint. The biggest contributor is {max(breakdown, key=breakdown.get)}. Be specific and brief."
+                    if user_guidance:
+                        quick_prompt += f"\n\nUser's specific context/goals: {user_guidance}"
                     analysis = services['llm'].generate_response(quick_prompt)
 
             st.markdown("### AI Analysis Results")

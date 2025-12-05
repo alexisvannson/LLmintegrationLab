@@ -44,7 +44,8 @@ class OllamaService:
         user_data: Dict,
         climate_context: Dict,
         historical_stats: Optional[Dict] = None,
-        location: Optional[str] = None
+        location: Optional[str] = None,
+        user_guidance: Optional[str] = None
     ) -> str:
         """
         Create a rich, personalized prompt for carbon footprint analysis
@@ -67,6 +68,9 @@ class OllamaService:
 
         if location:
             prompt += f"- User Location: {location}\n"
+
+        if user_guidance:
+            prompt += f"\n## USER'S SPECIFIC GUIDANCE\n{user_guidance}\n"
 
         prompt += f"""
 ## USER'S DAILY FOOTPRINT
@@ -102,7 +106,14 @@ Provide a comprehensive, personalized sustainability analysis:
    - Be SPECIFIC to their actual usage (don't suggest generic advice)
    - Quantify potential CO₂ savings
    - Explain how it helps the climate
-   - Make it actionable (what exactly should they do?)
+   - Make it actionable (what exactly should they do?)"""
+
+        if user_guidance:
+            prompt += f"""
+   - IMPORTANT: Pay special attention to the user's specific guidance and tailor your recommendations accordingly"""
+
+        prompt += """
+
 
 3. **Positive Recognition**
    - Highlight what they're doing well
@@ -188,13 +199,14 @@ Keep it motivating and achievable. Break down big goals into manageable steps.
         user_data: Dict,
         climate_context: Dict,
         historical_stats: Optional[Dict] = None,
-        location: Optional[str] = None
+        location: Optional[str] = None,
+        user_guidance: Optional[str] = None
     ) -> str:
         """
         Main method to analyze carbon footprint
         """
         prompt = self.create_personalized_analysis_prompt(
-            user_data, climate_context, historical_stats, location
+            user_data, climate_context, historical_stats, location, user_guidance
         )
         return self.generate_response(prompt)
 
